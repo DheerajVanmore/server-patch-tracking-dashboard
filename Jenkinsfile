@@ -6,11 +6,6 @@ pipeline {
         jdk 'JDK-21'
     }
 
-    environment {
-        APP_NAME = 'server-patch-dashboard'
-        ARTIFACT_DIR = 'backend/target'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -18,15 +13,15 @@ pipeline {
             }
         }
 
-        stage('Backend - Compile') {
+        stage('Build/Compile') {
             steps {
                 dir('backend') {
-                    bat 'mvn clean compile -DskipTests'
+                    bat 'mvn clean compile'
                 }
             }
         }
 
-        stage('Backend - Unit Tests') {
+        stage('Run Tests') {
             steps {
                 dir('backend') {
                     bat 'mvn test'
@@ -39,7 +34,7 @@ pipeline {
             }
         }
 
-        stage('Backend - Package') {
+        stage('Package') {
             steps {
                 dir('backend') {
                     bat 'mvn package -DskipTests'
@@ -47,39 +42,10 @@ pipeline {
             }
         }
 
-        stage('Frontend - Install') {
-            steps {
-                dir('frontend') {
-                    bat 'npm ci'
-                }
-            }
-        }
-
-        stage('Frontend - Build') {
-            steps {
-                dir('frontend') {
-                    bat 'npm run build'
-                }
-            }
-        }
-
-        stage('Archive Artifacts') {
+        stage('Archive JAR') {
             steps {
                 archiveArtifacts artifacts: 'backend/target/*.jar', fingerprint: true
-                archiveArtifacts artifacts: 'frontend/dist/**', allowEmptyArchive: true
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Build succeeded for ${APP_NAME}"
-        }
-        failure {
-            echo "Build failed for ${APP_NAME}"
-        }
-        always {
-            cleanWs()
         }
     }
 }
