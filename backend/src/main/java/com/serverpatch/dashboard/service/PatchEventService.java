@@ -77,7 +77,11 @@ public class PatchEventService {
         if ("PENDING".equals(oldStatus)) {
             if ("IN_PROGRESS".equals(newStatus) || "EXEMPTED".equals(newStatus)) isValid = true;
         } else if ("IN_PROGRESS".equals(oldStatus)) {
-            if ("PATCHED".equals(newStatus) || "FAILED".equals(newStatus)) isValid = true;
+            if ("PATCHED".equals(newStatus) || "FAILED".equals(newStatus) || "PENDING".equals(newStatus)) isValid = true;
+        } else if ("FAILED".equals(oldStatus)) {
+            if ("IN_PROGRESS".equals(newStatus) || "EXEMPTED".equals(newStatus) || "PENDING".equals(newStatus)) isValid = true;
+        } else if ("EXEMPTED".equals(oldStatus)) {
+            if ("PENDING".equals(newStatus) || "IN_PROGRESS".equals(newStatus)) isValid = true;
         }
 
         if (!isValid) {

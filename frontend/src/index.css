@@ -1,17 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --primary-color: #1a73e8;
-  --success-color: #34a853;
-  --warning-color: #fbbc04;
-  --danger-color: #ea4335;
-  --info-color: #4285f4;
-  --bg-color: #f8f9fa;
-  --surface-color: #ffffff;
-  --sidebar-bg: #1e293b;
-  --sidebar-text: #e2e8f0;
+  --primary-color: #3B82F6;
+  --secondary-accent: #06B6D4;
+  --success-color: #22C55E;
+  --warning-color: #F59E0B;
+  --in-progress-color: #F97316;
+  --danger-color: #EF4444;
+  --info-color: #06B6D4;
+  --bg-color: #0F172A;
+  --surface-color: #1E293B;
+  --sidebar-bg: #1E293B;
+  --sidebar-text: #F8FAFC;
   --sidebar-hover: #334155;
-  --text-primary: #202124;
-  --text-secondary: #5f6368;
-  --border-color: #dadce0;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --border-color: #334155;
+  --optional-accent: #8B5CF6;
 }
 
 * {
@@ -21,7 +26,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
   line-height: 1.5;

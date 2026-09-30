@@ -175,11 +175,12 @@ mvn clean package
 - Maven build pipeline
 - Jenkinsfile for CI
 
+- Selenium automated UI tests (in `tests/selenium`)
+- Docker containerization (with `Dockerfile`s)
+- Docker Compose orchestration (with `docker-compose.yml`)
+- Ansible provisioning (in `ansible/playbook.yml`)
+
 ### 📋 Planned (Future Phases)
-- Selenium automated UI tests
-- Docker containerization
-- Docker Compose orchestration
-- Ansible provisioning
 - Linux/Ubuntu deployment
 
 ## License

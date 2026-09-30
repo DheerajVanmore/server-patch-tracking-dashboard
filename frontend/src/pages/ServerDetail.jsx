@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getServerById } from '../services/serverService';
 import StatusBadge from '../components/StatusBadge';
 import SeverityBadge from '../components/SeverityBadge';
+import EnvironmentBadge from '../components/EnvironmentBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -45,7 +46,7 @@ function ServerDetail() {
           <div><strong>Hostname:</strong> {server.hostname}</div>
           <div><strong>IP Address:</strong> {server.ipAddress}</div>
           <div><strong>OS:</strong> {server.os}</div>
-          <div><strong>Environment:</strong> {server.environment}</div>
+          <div><strong>Environment:</strong> <EnvironmentBadge environment={server.environment} /></div>
           <div><strong>Owner Team:</strong> {server.ownerTeam}</div>
           <div><strong>Status:</strong> <StatusBadge status={server.status} /></div>
           <div><strong>Last Checked:</strong> {server.lastChecked ? new Date(server.lastChecked).toLocaleString() : 'N/A'}</div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getServers, createServer, updateServer, deleteServer } from '../services/serverService';
 import StatusBadge from '../components/StatusBadge';
+import EnvironmentBadge from '../components/EnvironmentBadge';
 import SearchBar from '../components/SearchBar';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -169,7 +170,7 @@ function Servers() {
                       <td><Link to={`/servers/${server.id}`} style={{color: 'var(--primary-color)', fontWeight: 500}}>{server.hostname}</Link></td>
                       <td>{server.ipAddress}</td>
                       <td>{server.os}</td>
-                      <td>{server.environment}</td>
+                      <td><EnvironmentBadge environment={server.environment} /></td>
                       <td>{server.ownerTeam}</td>
                       <td><StatusBadge status={server.status} /></td>
                       <td>{server.lastChecked ? new Date(server.lastChecked).toLocaleString() : 'N/A'}</td>

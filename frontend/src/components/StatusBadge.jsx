@@ -1,25 +1,26 @@
 function StatusBadge({ status }) {
-  const getStatusColor = () => {
+  const getBadgeClass = () => {
     switch (status) {
       case 'ACTIVE':
       case 'PATCHED':
-        return { backgroundColor: '#e6f4ea', color: '#137333' }; // Green
+        return 'badge-success';
       case 'MAINTENANCE':
       case 'IN_PROGRESS':
+        return 'badge-in-progress';
       case 'PENDING':
-        return { backgroundColor: '#fef7e0', color: '#b06000' }; // Yellow
+        return 'badge-warning';
       case 'OFFLINE':
       case 'FAILED':
-        return { backgroundColor: '#fce8e6', color: '#c5221f' }; // Red
+        return 'badge-danger';
       case 'EXEMPTED':
-        return { backgroundColor: '#e8f0fe', color: '#1a73e8' }; // Blue
+        return 'badge-info';
       default:
-        return { backgroundColor: '#f1f3f4', color: '#5f6368' }; // Gray
+        return 'badge-neutral';
     }
   };
 
   return (
-    <span className="badge" style={getStatusColor()}>
+    <span className={`badge ${getBadgeClass()}`}>
       {status}
     </span>
   );

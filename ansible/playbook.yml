@@ -1,0 +1,38 @@
+---
+- name: Deploy Server Patch Tracking Dashboard
+  hosts: all
+  become: yes
+  vars:
+    project_dir: /opt/server-patch-tracking-dashboard
+    repo_url: https://github.com/Anushka/server-patch-tracking-dashboard.git
+  tasks:
+    - name: Ensure apt cache is updated
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install dependencies (Docker, Git, Python3)
+      package:
+        name:
+          - git
+          - docker.io
+          - docker-compose
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Clone the repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_dir }}"
+        version: main
+        force: yes
+
+    - name: Run docker-compose up
+      command: docker-compose up -d --build
+      args:
+        chdir: "{{ project_dir }}"

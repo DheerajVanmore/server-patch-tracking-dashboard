@@ -37,16 +37,22 @@ function Dashboard() {
       </div>
 
       <div className="summary-grid">
-        <SummaryCard title="Total Servers" value={data.totalServers} color="#1a73e8" />
-        <SummaryCard title="Patched" value={data.patched} color="#34a853" />
-        <SummaryCard title="Pending" value={data.pending} color="#fbbc04" />
-        <SummaryCard title="Failed" value={data.failed} color="#ea4335" />
-        <SummaryCard title="Exempted" value={data.exempted} color="#4285f4" />
-        <SummaryCard 
-          title="Compliance %" 
-          value={`${data.compliancePercentage.toFixed(1)}%`} 
-          color={data.compliancePercentage >= 90 ? '#34a853' : data.compliancePercentage >= 75 ? '#fbbc04' : '#ea4335'} 
-        />
+        <SummaryCard title="Total Servers" value={data.totalServers} color="var(--primary-color)" />
+        <SummaryCard title="Patched" value={data.patched} color="var(--success-color)" />
+        <SummaryCard title="Pending" value={data.pending} color="var(--warning-color)" />
+        <SummaryCard title="Failed" value={data.failed} color="var(--danger-color)" />
+        <SummaryCard title="Exempted" value={data.exempted} color="var(--info-color)" />
+        <div className="summary-card" style={{ borderLeft: `4px solid ${data.compliancePercentage >= 90 ? 'var(--success-color)' : data.compliancePercentage >= 75 ? 'var(--warning-color)' : 'var(--danger-color)'}` }}>
+          <h3 style={{ color: 'var(--text-secondary)' }}>Compliance %</h3>
+          <div className="value" style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>{`${data.compliancePercentage.toFixed(1)}%`}</div>
+          <div style={{ width: '100%', backgroundColor: 'var(--border-color)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ 
+              width: `${data.compliancePercentage}%`, 
+              backgroundColor: data.compliancePercentage >= 90 ? 'var(--success-color)' : data.compliancePercentage >= 75 ? 'var(--warning-color)' : 'var(--danger-color)',
+              height: '100%' 
+            }}></div>
+          </div>
+        </div>
       </div>
 
       <div className="card">

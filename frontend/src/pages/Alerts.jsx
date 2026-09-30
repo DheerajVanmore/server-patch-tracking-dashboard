@@ -43,7 +43,7 @@ function Alerts() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           {alerts.map(alert => (
-            <div key={alert.id} className={`alert-card ${alert.severity === 'CRITICAL' ? 'critical' : alert.alertType === 'PATCH_FAILURE' ? 'failed' : ''}`}>
+            <div key={alert.id} className={`alert-card ${alert.severity === 'CRITICAL' ? 'critical' : alert.severity === 'HIGH' ? 'high' : alert.severity === 'MEDIUM' ? 'medium' : ''}`}>
               <div className="flex justify-between items-center mb-2">
                 <div className="flex gap-3 items-center">
                   <SeverityBadge severity={alert.severity} />
