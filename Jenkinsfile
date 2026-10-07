@@ -70,6 +70,11 @@ pipeline {
                 '''
                 // Start new instance in background
                 bat '''
+                    set DB_HOST=%DB_HOST%
+                    set DB_PORT=%DB_PORT%
+                    set DB_NAME=%DB_NAME%
+                    set DB_USERNAME=%DB_USERNAME%
+                    set DB_PASSWORD=%DB_PASSWORD%
                     start /B java -jar backend\\target\\%JAR_NAME% > backend_app.log 2>&1
                 '''
                 // Wait for startup
