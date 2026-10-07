@@ -185,4 +185,4 @@ mvn clean package
 
 ## License
 
-This project is a semester project for educational purposes.
+This project is a semester project for educational purposes only.
