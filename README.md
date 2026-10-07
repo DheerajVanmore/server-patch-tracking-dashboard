@@ -40,17 +40,25 @@ User → React Frontend → REST API (JSON) → Spring Boot Backend → MySQL Da
 
 ```
 server-patch-tracking-dashboard/
-├── frontend/          # React application (Vite)
-├── backend/           # Spring Boot application (Maven)
-├── database/          # SQL schema and seed data
+├── frontend/              # React application (Vite)
+│   └── Dockerfile
+├── backend/               # Spring Boot application (Maven)
+│   └── Dockerfile
+├── database/              # SQL schema and seed data
 │   ├── schema.sql
 │   └── seed.sql
-├── tests/selenium/    # [PLANNED] Selenium UI tests
-├── docker/            # [PLANNED] Docker configuration
-├── ansible/           # [PLANNED] Ansible provisioning
-├── docs/              # Documentation
-├── .github/           # Issue templates, PR template
-├── Jenkinsfile        # CI pipeline definition
+├── tests/selenium/        # Selenium UI/API tests (Python + pytest)
+│   ├── test_dashboard.py
+│   └── requirements.txt
+├── ansible/               # Ansible deployment playbook
+│   ├── playbook.yml
+│   └── inventory.ini
+├── scripts/               # Automation scripts
+│   └── health_check.py    # Health check & recovery
+├── docs/                  # Documentation
+├── .github/               # Issue templates, PR template
+├── docker-compose.yml     # Full-stack Docker orchestration
+├── Jenkinsfile            # CI/CD pipeline definition
 ├── .gitignore
 └── README.md
 ```
@@ -59,66 +67,37 @@ server-patch-tracking-dashboard/
 
 - JDK 21+
 - Maven 3.9+
-- Node.js 22 LTS
+- Node.js 20+
 - npm 9+
 - MySQL 8.4
+- Docker & Docker Compose
+- Python 3.10+ (for Selenium tests)
 - Git
 
-## MySQL Setup
+## Running Locally (without Docker)
 
 1. Ensure MySQL is running on localhost:3306
-2. Run the schema:
+2. Run the schema and seed data:
    ```bash
    mysql -u root -p < database/schema.sql
-   ```
-3. Load seed data:
-   ```bash
    mysql -u root -p < database/seed.sql
    ```
-
-## Backend Setup
-
-```bash
-cd backend
-
-# Set environment variables (or create .env based on .env.example)
-# DB_HOST=localhost
-# DB_PORT=3306
-# DB_NAME=server_patch_dashboard
-# DB_USERNAME=root
-# DB_PASSWORD=your_password
-
-# Build
-mvn clean package
-
-# Run
-mvn spring-boot:run
-# or: java -jar target/dashboard-0.0.1-SNAPSHOT.jar
-```
-
-Backend runs on: http://localhost:8080
-
-## Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-```
-
-Frontend runs on: http://localhost:5173
-
-## How to Run (Full Stack)
-
-1. Start MySQL
-2. Run database scripts (schema.sql, seed.sql)
 3. Start backend: `cd backend && mvn spring-boot:run`
 4. Start frontend: `cd frontend && npm run dev`
 5. Open http://localhost:5173
+
+## Running with Docker Compose
+
+```bash
+docker compose up -d --build
+```
+
+This starts:
+- **MySQL 8.4** on port 3306 (auto-seeds schema + data)
+- **Spring Boot backend** on port 8080
+- **React frontend** (via nginx) on port 5173
+
+To stop: `docker compose down`
 
 ## API Overview
 
@@ -142,46 +121,75 @@ Frontend runs on: http://localhost:5173
 ## Testing
 
 ```bash
-# Backend tests
-cd backend
-mvn clean test
+# Backend unit tests (15 tests)
+cd backend && mvn clean test
 
-# Build verification
-mvn clean package
+# Selenium tests (requires backend running on port 8080)
+pip install -r tests/selenium/requirements.txt
+python -m pytest tests/selenium/test_dashboard.py::TestBackendAPI -v
 ```
 
-## Maven Commands
+## DevOps Pipeline (CI/CD Workflow)
 
-| Command | Purpose |
-|---------|---------|
-| `mvn clean compile` | Compile the project |
-| `mvn clean test` | Run unit tests |
-| `mvn clean package` | Build JAR artifact |
-| `mvn spring-boot:run` | Run the application |
+```
+GitHub Push
+  → Jenkins CI
+     → Checkout
+     → Maven Compile
+     → Unit Tests (15 tests, JUnit reports)
+     → Maven Package (JAR)
+     → Deploy JAR locally (port 8080)
+     → Selenium Tests (3 API tests via headless Chrome)
+     → Docker Build & Deploy (docker compose up)
+     → Verify deployment (HTTP 200 health check)
+  → Ansible Provisioning (docker compose on target)
+  → Health Check & Recovery (scripts/health_check.py)
+```
 
-## Current Status
+### Jenkins Pipeline Stages (Jenkinsfile)
 
-### ✅ Implemented
-- Database schema and seed data
-- Spring Boot backend with full REST API
-- Server CRUD with search/filter
-- Patch CRUD with search/filter
-- Patch event workflow with state validation
-- Dashboard summary with compliance calculation
-- Alert generation from application state
-- React frontend with all pages
-- Frontend-backend integration
-- Backend automated tests
-- Maven build pipeline
-- Jenkinsfile for CI
+| Stage | Description |
+|-------|-------------|
+| Checkout | Clone from SCM |
+| Build/Compile | `mvn clean compile` |
+| Run Tests | `mvn test` + JUnit report |
+| Package | `mvn package -DskipTests` |
+| Archive JAR | Archive build artifact |
+| Deploy JAR | Kill old process, start JAR, verify HTTP 200 |
+| Selenium Tests | Run pytest against backend API, publish results |
+| Docker Build & Deploy | `docker compose down` → `docker compose up -d --build` → verify |
 
-- Selenium automated UI tests (in `tests/selenium`)
-- Docker containerization (with `Dockerfile`s)
-- Docker Compose orchestration (with `docker-compose.yml`)
-- Ansible provisioning (in `ansible/playbook.yml`)
+### Ansible Deployment
 
-### 📋 Planned (Future Phases)
-- Linux/Ubuntu deployment
+```bash
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+```
+
+Idempotent: re-running does not change already-correct state.
+
+### Health Check & Recovery
+
+```bash
+python scripts/health_check.py
+```
+
+Checks `/api/dashboard/summary` → if unhealthy, restarts Docker containers → re-verifies.
+
+## Semester DevOps Milestones
+
+| Week | Milestone | Status |
+|------|-----------|--------|
+| 1–4 | Problem definition, planning, Git setup | ✅ |
+| 5–6 | Core feature development, MVP | ✅ |
+| 7 | Jenkins CI installation | ✅ |
+| 8 | Pipeline as Code + JAR deployment | ✅ |
+| 9 | Selenium test design/execution | ✅ |
+| 10 | Continuous testing in Jenkins | ✅ |
+| 11 | Docker image/container lifecycle | ✅ |
+| 12 | Jenkins-Docker CD | ✅ |
+| 13 | Ansible configuration management | ✅ |
+| 14 | Idempotency, health check, recovery | ✅ |
+| 15 | End-to-end release/documentation | ✅ |
 
 ## License
 

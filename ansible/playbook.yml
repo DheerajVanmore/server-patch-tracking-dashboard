@@ -1,38 +1,60 @@
 ---
+# =============================================================
+# Server Patch Tracking Dashboard — Ansible Deployment Playbook
+# =============================================================
+# Deploys (or re-deploys) the application using Docker Compose.
+# Designed for local execution:
+#   ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+#
+# Idempotent: running twice produces no unnecessary changes
+# when containers are already in the desired state.
+# =============================================================
+
 - name: Deploy Server Patch Tracking Dashboard
-  hosts: all
-  become: yes
+  hosts: local
+  gather_facts: false
   vars:
-    project_dir: /opt/server-patch-tracking-dashboard
-    repo_url: https://github.com/Anushka/server-patch-tracking-dashboard.git
+    project_dir: "{{ playbook_dir | dirname }}"
+
   tasks:
-    - name: Ensure apt cache is updated
-      apt:
-        update_cache: yes
-      when: ansible_os_family == 'Debian'
+    # ----------------------------------------------------------
+    # 1. Verify Docker is available
+    # ----------------------------------------------------------
+    - name: Check Docker is installed and reachable
+      command: docker --version
+      register: docker_version
+      changed_when: false
 
-    - name: Install dependencies (Docker, Git, Python3)
-      package:
-        name:
-          - git
-          - docker.io
-          - docker-compose
-        state: present
+    - name: Print Docker version
+      debug:
+        msg: "{{ docker_version.stdout }}"
 
-    - name: Ensure Docker service is running
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Clone the repository
-      git:
-        repo: "{{ repo_url }}"
-        dest: "{{ project_dir }}"
-        version: main
-        force: yes
-
-    - name: Run docker-compose up
-      command: docker-compose up -d --build
+    # ----------------------------------------------------------
+    # 2. Build / pull images and start containers
+    # ----------------------------------------------------------
+    - name: Start application with docker compose
+      command: docker compose up -d --build
       args:
         chdir: "{{ project_dir }}"
+      register: compose_up
+
+    - name: Show docker compose output
+      debug:
+        msg: "{{ compose_up.stdout_lines }}"
+
+    # ----------------------------------------------------------
+    # 3. Wait for backend to become healthy
+    # ----------------------------------------------------------
+    - name: Wait for backend API to respond
+      uri:
+        url: "http://localhost:8080/api/dashboard/summary"
+        method: GET
+        status_code: 200
+      register: health
+      retries: 20
+      delay: 5
+      until: health.status == 200
+
+    - name: Print health-check result
+      debug:
+        msg: "Backend is healthy — HTTP {{ health.status }}"
